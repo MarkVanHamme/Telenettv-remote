@@ -42,6 +42,12 @@ final class RemoteController: ObservableObject {
     }
 
     init() {
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("-demo") {
+            loadDemo()
+            return
+        }
+        #endif
         if HorizonAPI.storedRefreshToken != nil {
             Task { await start() }
         }
@@ -242,4 +248,25 @@ final class RemoteController: ObservableObject {
         guard hapticsEnabled else { return }
         UIImpactFeedbackGenerator(style: style).impactOccurred()
     }
+
+    #if DEBUG
+    /// Demo-modus zonder Telenet-account (voor screenshots en de simulator).
+    private func loadDemo() {
+        boxes = [
+            SetTopBox(id: "3C36E4-EOSSTB-DEMO0001", name: "Woonkamer", platform: "EOS2"),
+            SetTopBox(id: "3C36E4-EOSSTB-DEMO0002", name: "Slaapkamer", platform: "EOS"),
+        ]
+        let names = ["Eén", "VTM", "Play4", "Play5", "VTM 2", "Canvas", "Ketnet", "Play6",
+                     "Play7", "VTM 3", "VTM 4", "Kanaal Z", "VRT NWS", "Eclips TV",
+                     "Play Sports 1", "Discovery", "National Geographic", "BBC One"]
+        channels = names.enumerated().map { i, name in
+            Channel(id: "demo-\(i + 1)", number: i + 1, name: name, logoURL: nil, isRadio: false)
+        }
+        selectedBoxId = boxes.first?.id
+        powerStates = [boxes[0].id: .running, boxes[1].id: .standby]
+        nowPlaying = [boxes[0].id: NowPlaying(uiStatus: "mainUI", sourceType: "linear", channelId: "demo-1")]
+        mqttConnected = true
+        phase = .ready
+    }
+    #endif
 }

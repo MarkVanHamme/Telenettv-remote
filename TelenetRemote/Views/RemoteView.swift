@@ -92,6 +92,7 @@ struct RemoteView: View {
                     Button { showSettings = true } label: { Image(systemName: "gearshape") }
                 }
             }
+            .onAppear(perform: openDemoSheet)
             .sheet(isPresented: $showNumbers) {
                 NumberPadView().presentationDetents([.medium])
             }
@@ -102,6 +103,18 @@ struct RemoteView: View {
                 SettingsView()
             }
         }
+    }
+
+    /// `-demoSheet numbers|channels|settings` opent meteen een scherm (voor screenshots).
+    private func openDemoSheet() {
+        #if DEBUG
+        switch UserDefaults.standard.string(forKey: "demoSheet") {
+        case "numbers": showNumbers = true
+        case "channels": showChannels = true
+        case "settings": showSettings = true
+        default: break
+        }
+        #endif
     }
 
     private var boxPicker: some View {
