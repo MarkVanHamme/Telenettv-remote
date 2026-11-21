@@ -1,0 +1,7 @@
+# Xcode (project wordt gegenereerd met XcodeGen)
+*.xcodeproj
+*.xcworkspace
+xcuserdata/
+DerivedData/
+build/
+.DS_Store
